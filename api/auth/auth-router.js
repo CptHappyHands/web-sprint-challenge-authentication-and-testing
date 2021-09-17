@@ -1,4 +1,7 @@
 const router = require('express').Router();
+const next = require('../middleware/restricted')
+const bcrypt = require('bcryptjs')
+const tokenBuiler = require("./token-builder")
 
 router.post('/register', (req, res) => {
   res.end('implement register, please!');
