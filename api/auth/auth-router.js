@@ -1,7 +1,8 @@
 const router = require('express').Router();
 const next = require('../middleware/restricted')
-const bcrypt = require('bcryptjs')
-const tokenBuiler = require("./token-builder")
+const bcrypt = require('bcrypt')
+const tokenBuilder = require('./token-builder');
+const { checkUsernameExists } = require('../middleware/moreMiddleware');
 
 router.post('/register', (req, res) => {
   res.end('implement register, please!');
@@ -32,8 +33,24 @@ router.post('/register', (req, res) => {
   */
 });
 
-router.post('/login', (req, res) => {
-  res.end('implement login, please!');
+router.post('/login', checkUsernameExists, (req, res) => {
+  if (bcrypt.compareSynv(req.body.password, req.users.password)) {
+    const token = tokenBuilder(req.users)
+    res.status(200).json({
+      message: `welcome, ${req.users.username}`,
+      token
+    })
+  } else if (!req.body.username || !req.body.password) {
+    next({
+      status: 401,
+      message: "username and password required"
+    })
+  } else {
+    next({
+      status: 401,
+      message: "invalid credentials"
+    })
+  }
   /*
     IMPLEMENT
     You are welcome to build additional middlewares to help with the endpoint's functionality.
