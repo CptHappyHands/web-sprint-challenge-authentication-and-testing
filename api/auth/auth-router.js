@@ -1,11 +1,22 @@
 const router = require('express').Router();
-const {restricted} = require('../middleware/restricted')
+// const {restricted} = require('../middleware/restricted')
 const bcrypt = require('bcrypt')
 const tokenBuilder = require('./token-builder');
 const { checkUsernameExists } = require('../middleware/moreMiddleware');
+const User = require('../jokes/jokes-model')
 
-router.post('/register', (req, res) => {
-  res.end('implement register, please!');
+router.post('/register', async (req, res, next) => {
+  try {
+    const {username, password} = req.body
+    const hash = bcrypt.hashSync(password, 8)
+    const newUser = { username, password: hash}
+    const user = await User.add(newUser)
+    res.status(201).json(user)
+  } catch (err) {
+    next(err)
+  }
+
+  
   /*
     IMPLEMENT
     You are welcome to build additional middlewares to help with the endpoint's functionality.
@@ -33,12 +44,12 @@ router.post('/register', (req, res) => {
   */
 });
 
-router.post('/login', checkUsernameExists, (req, res) => {
+router.post('/login', checkUsernameExists, (req, res, next) => {
   if (bcrypt.compareSynv(req.body.password, req.users.password)) {
     const token = tokenBuilder(req.users)
     res.status(200).json({
       message: `welcome, ${req.users.username}`,
-      token
+      token,
     })
   } else if (!req.body.username || !req.body.password) {
     next({
