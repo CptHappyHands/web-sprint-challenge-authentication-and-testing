@@ -2,12 +2,13 @@ const router = require('express').Router();
 // const {restricted} = require('../middleware/restricted')
 const bcrypt = require('bcrypt')
 const tokenBuilder = require('./token-builder');
-const { checkUsernameExists, checkPasswordLength, checkUsernameFree } = require('../middleware/moreMiddleware');
+const { checkUsernameExists, checkUsernameFree } = require('../middleware/moreMiddleware');
 const User = require('../jokes/jokes-model')
 
-router.post('/register', checkPasswordLength, checkUsernameFree, async (req, res, next) => {
-  try {
-    console.log(req.body)
+router.post('/register', checkUsernameFree, async (req, res, next) => {
+ console.log(req.body) 
+ try {
+    
     const {username, password} = req.body
     const hash = bcrypt.hashSync(password, 8)
     const newUser = { username, password: hash}
@@ -46,7 +47,8 @@ router.post('/register', checkPasswordLength, checkUsernameFree, async (req, res
 });
 
 router.post('/login', checkUsernameExists, (req, res, next) => {
-  if (bcrypt.compareSynv(req.body.password, req.users.password)) {
+  console.log(req.body)
+  if (bcrypt.compareSync(req.body.password, req.users.password)) {
     const token = tokenBuilder(req.users)
     res.status(200).json({
       message: `welcome, ${req.users.username}`,
