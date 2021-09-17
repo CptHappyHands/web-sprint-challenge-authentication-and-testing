@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const next = require('../middleware/restricted')
+const {restricted} = require('../middleware/restricted')
 const bcrypt = require('bcrypt')
 const tokenBuilder = require('./token-builder');
 const { checkUsernameExists } = require('../middleware/moreMiddleware');
