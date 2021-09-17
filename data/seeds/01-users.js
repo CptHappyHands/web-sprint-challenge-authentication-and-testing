@@ -1,7 +1,13 @@
 exports.seed = function (knex) {
-  return knex('users').insert({
-    username: 'Captain Marvel',
-    password: 'eyJ1c2VybmFtZSI6IkNhcHRhaW4gTWFydmVsIiwicGFzc3dvcmQiOiJmb29iYXIifQ' //password foobar
-   
-  })
+  return knex("users")
+    .truncate()
+    .then(function () {
+      return knex("users").insert([
+        {
+          username: "Captain Marvel",
+          password:
+            "2a$08$jG.wIGR2S4hxuyWNcBf9MuoC4y0dNy7qC/LbmtuFBSdIhWks2LhpG", //password foobar
+        },
+      ]);
+    });
 };

@@ -1,24 +1,26 @@
-const router = require('express').Router();
+const router = require("express").Router();
 // const {restricted} = require('../middleware/restricted')
-const bcrypt = require('bcrypt')
-const tokenBuilder = require('./token-builder');
-const { checkUsernameExists, checkUsernameFree } = require('../middleware/moreMiddleware');
-const User = require('../jokes/jokes-model')
+const bcrypt = require("bcrypt");
+const tokenBuilder = require("./token-builder");
+const {
+  checkUsernameFree,
+  checkUsernameExists,
+} = require("../middleware/moreMiddleware");
+const User = require("../jokes/jokes-model");
 
-router.post('/register', checkUsernameFree, async (req, res, next) => {
- console.log(req.body) 
- try {
-    
-    const {username, password} = req.body
-    const hash = bcrypt.hashSync(password, 8)
-    const newUser = { username, password: hash}
-    const user = await User.add(newUser)
-    res.status(201).json(user)
+router.post("/register", checkUsernameFree, async (req, res, next) => {
+  const { username, password } = req.body;
+  // console.log(username, "here in register post");
+  // res.json(req.body);
+  try {
+    const hash = bcrypt.hashSync(password, 8);
+    const newUser = { username, password: hash };
+    const user = await User.add(newUser);
+    res.status(201).json(user);
   } catch (err) {
-    next(err)
+    next(err);
   }
 
-  
   /*
     IMPLEMENT
     You are welcome to build additional middlewares to help with the endpoint's functionality.
@@ -46,24 +48,24 @@ router.post('/register', checkUsernameFree, async (req, res, next) => {
   */
 });
 
-router.post('/login', checkUsernameExists, (req, res, next) => {
-  console.log(req.body)
+router.post("/login", checkUsernameExists, (req, res, next) => {
+  console.log(req.body.password, "in login");
   if (bcrypt.compareSync(req.body.password, req.users.password)) {
-    const token = tokenBuilder(req.users)
+    const token = tokenBuilder(req.users);
     res.status(200).json({
       message: `welcome, ${req.users.username}`,
       token,
-    })
+    });
   } else if (!req.body.username || !req.body.password) {
     next({
       status: 401,
-      message: "username and password required"
-    })
+      message: "username and password required",
+    });
   } else {
     next({
       status: 401,
-      message: "invalid credentials"
-    })
+      message: "invalid credentials",
+    });
   }
   /*
     IMPLEMENT
